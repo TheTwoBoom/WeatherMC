@@ -4,7 +4,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.event.server.ServerListPingEvent;
 import net.minestom.server.ping.Status;
 
-public class TabList {
+public class ServerList {
     public static void handle(ServerListPingEvent event) {
         assert event.getConnection() != null;
         var playerVersion = event.getConnection().getProtocolVersion();

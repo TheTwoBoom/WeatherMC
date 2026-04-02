@@ -1,13 +1,15 @@
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.Player;
-import net.minestom.server.event.EventListener;
+import net.minestom.server.dialog.DialogAction;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
+import net.minestom.server.event.player.PlayerCustomClickEvent;
+import net.minestom.server.event.player.PlayerMoveEvent;
+import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.server.ServerListPingEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.world.Difficulty;
 
 public class Server {
     public static void main(String[] args) {
@@ -23,10 +25,16 @@ public class Server {
 
         // Add an event callback to specify the spawning instance (and the spawn position)
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
-        globalEventHandler.addListener(ServerListPingEvent.class, TabList::handle);
-        globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, AsyncPlayerConfig::handle);
+        globalEventHandler.addListener(ServerListPingEvent.class, ServerList::handle);
+        globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> AsyncPlayerConfig.handle(event, instanceContainer));
+        globalEventHandler.addListener(PlayerMoveEvent.class, CancelMove::handle);
+        globalEventHandler.addListener(PlayerSpawnEvent.class, ShowPrivacyPolicy::handle);
+        globalEventHandler.addListener(PlayerCustomClickEvent.class, CustomClick::handle);
 
         // Start the server on port 25565
+        MinecraftServer.setBrandName("WeatherMC");
+        MinecraftServer.setDifficulty(Difficulty.PEACEFUL);
+        MinecraftServer.setCompressionThreshold(64);
         minecraftServer.start("0.0.0.0", 25565);
     }
 }
