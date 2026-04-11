@@ -1,12 +1,11 @@
+package app.myhtl.weathermc;
+
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.dialog.*;
 import net.minestom.server.entity.Player;
-import net.minestom.server.registry.HolderSet;
 
-import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.List;
 
 public class ConfigDialog {

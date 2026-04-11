@@ -1,12 +1,17 @@
+package app.myhtl.weathermc.handlers;
+
+import app.myhtl.weathermc.ConfigDialog;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.event.player.PlayerCustomClickEvent;
+import net.minestom.server.tag.Tag;
 
 public class CustomClick {
     public static void handle(PlayerCustomClickEvent event) {
         switch (event.getKey().asMinimalString()) {
             case "weathermc:privacy_policy/accept":
+                event.getPlayer().setTag(Tag.Boolean("privacy_policy"), true);
                 ConfigDialog.showGeneral(event.getPlayer());
                 break;
             case "weathermc:privacy_policy/decline":

@@ -1,3 +1,5 @@
+package app.myhtl.weathermc.handlers;
+
 import net.minestom.server.event.player.PlayerMoveEvent;
 
 public class CancelMove {
