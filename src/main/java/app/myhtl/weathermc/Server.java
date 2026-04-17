@@ -1,6 +1,10 @@
 package app.myhtl.weathermc;
 
 import app.myhtl.weathermc.handlers.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonObject;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
@@ -13,8 +17,40 @@ import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.world.Difficulty;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.Properties;
+
 public class Server {
+    public static JsonObject jsonObject;
+    public static void loadPlayerData() {
+        try (var in = new FileReader("playerData.json")) {
+            jsonObject = new Gson().fromJson(in.readAllAsString(), JsonElement.class).getAsJsonObject();
+        } catch (IOException e) {
+            jsonObject = new JsonObject();
+        }
+    }
+    public static void savePlayerData() {
+        try (var out = new BufferedOutputStream(new FileOutputStream("playerData.json"))) {
+            out.write(new Gson().toJson(jsonObject).getBytes(StandardCharsets.UTF_8));
+        } catch (IOException _) {}
+    }
+    public static Properties loadConfig() {
+        String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
+        String appConfigPath = rootPath + "server.properties";
+
+        Properties serverProps = new Properties();
+        try {
+            serverProps.load(new FileInputStream(appConfigPath));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return serverProps;
+    }
     public static void main(String[] args) {
+        System.setProperty("minestom.tps", "5");
+        loadPlayerData();
         // Initialization
         MinecraftServer minecraftServer = MinecraftServer.init();
 
