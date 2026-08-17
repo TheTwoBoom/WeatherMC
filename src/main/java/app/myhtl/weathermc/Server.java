@@ -1,5 +1,7 @@
 package app.myhtl.weathermc;
 
+import app.myhtl.weathermc.commands.DataCollection;
+import app.myhtl.weathermc.commands.WeatherCommand;
 import app.myhtl.weathermc.handlers.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -24,6 +26,42 @@ import java.util.Properties;
 
 public class Server {
     public static JsonObject jsonObject;
+    public static Properties config = loadConfig();
+    public static String openWeatherKey;
+    static void main(String[] args) {
+        System.setProperty("minestom.tps", "1");
+        loadPlayerData();
+        // Initialization
+        MinecraftServer minecraftServer = MinecraftServer.init();
+
+        try (FileReader inputStream = new FileReader("key.env")) {
+            openWeatherKey = inputStream.readAllAsString();
+        } catch (IOException e) {
+            throw new RuntimeException("Couldn't read key.env! Please add the OpenWeatherMap appID to the file");
+        }
+
+        // Create the instance
+        InstanceManager instanceManager = MinecraftServer.getInstanceManager();
+        InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
+
+        // Set the ChunkGenerator
+        instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 40, Block.BARRIER));
+
+        // Add an event callback to specify the spawning instance (and the spawn position)
+        GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
+        globalEventHandler.addListener(ServerListPingEvent.class, ServerList::handle);
+        globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> AsyncPlayerConfig.handle(event, instanceContainer));
+        globalEventHandler.addListener(PlayerSpawnEvent.class, ShowPrivacyPolicy::handle);
+        globalEventHandler.addListener(PlayerCustomClickEvent.class, CustomClick::handle);
+
+        // Start the server on port 25565
+        MinecraftServer.getCommandManager().register(new DataCollection.LocationCommand());
+        MinecraftServer.getCommandManager().register(new WeatherCommand());
+        MinecraftServer.setBrandName("WeatherMC");
+        MinecraftServer.setDifficulty(Difficulty.PEACEFUL);
+        MinecraftServer.setCompressionThreshold(64);
+        minecraftServer.start("0.0.0.0", 25565);
+    }
     public static void loadPlayerData() {
         try (var in = new FileReader("playerData.json")) {
             jsonObject = new Gson().fromJson(in.readAllAsString(), JsonElement.class).getAsJsonObject();
@@ -37,9 +75,7 @@ public class Server {
         } catch (IOException _) {}
     }
     public static Properties loadConfig() {
-        String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
-        String appConfigPath = rootPath + "server.properties";
-
+        String appConfigPath = "server.properties";
         Properties serverProps = new Properties();
         try {
             serverProps.load(new FileInputStream(appConfigPath));
@@ -47,32 +83,5 @@ public class Server {
             throw new RuntimeException(e);
         }
         return serverProps;
-    }
-    public static void main(String[] args) {
-        System.setProperty("minestom.tps", "5");
-        loadPlayerData();
-        // Initialization
-        MinecraftServer minecraftServer = MinecraftServer.init();
-
-        // Create the instance
-        InstanceManager instanceManager = MinecraftServer.getInstanceManager();
-        InstanceContainer instanceContainer = instanceManager.createInstanceContainer();
-
-        // Set the ChunkGenerator
-        instanceContainer.setGenerator(unit -> unit.modifier().fillHeight(0, 40, Block.BARRIER));
-
-        // Add an event callback to specify the spawning instance (and the spawn position)
-        GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
-        globalEventHandler.addListener(ServerListPingEvent.class, ServerList::handle);
-        globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> AsyncPlayerConfig.handle(event, instanceContainer));
-        globalEventHandler.addListener(PlayerMoveEvent.class, CancelMove::handle);
-        globalEventHandler.addListener(PlayerSpawnEvent.class, ShowPrivacyPolicy::handle);
-        globalEventHandler.addListener(PlayerCustomClickEvent.class, CustomClick::handle);
-
-        // Start the server on port 25565
-        MinecraftServer.setBrandName("WeatherMC");
-        MinecraftServer.setDifficulty(Difficulty.PEACEFUL);
-        MinecraftServer.setCompressionThreshold(64);
-        minecraftServer.start("0.0.0.0", 25565);
     }
 }

@@ -6,6 +6,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.event.server.ServerListPingEvent;
 import net.minestom.server.ping.Status;
 
+import java.net.InetSocketAddress;
+
 public class ServerList {
     public static void handle(ServerListPingEvent event) {
         assert event.getConnection() != null;
@@ -29,5 +31,8 @@ public class ServerList {
                 false
         );
         event.setStatus(status);
+
+        var playerIP = ((InetSocketAddress) event.getConnection().getRemoteAddress()).getAddress().getHostAddress();
+        System.out.println(playerIP);
     }
 }

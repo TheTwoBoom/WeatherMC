@@ -10,6 +10,8 @@ import net.minestom.server.tag.Tag;
 import java.util.ArrayList;
 import java.util.List;
 
+import static app.myhtl.weathermc.Server.jsonObject;
+
 public class ShowPrivacyPolicy {
     static DialogAction accept = new DialogAction.Custom(Key.key("weathermc", "privacy_policy/accept"), null);
     static DialogAction decline = new DialogAction.Custom(Key.key("weathermc", "privacy_policy/decline"), null);
@@ -20,16 +22,16 @@ public class ShowPrivacyPolicy {
                     false,
                     false,
                     DialogAfterAction.CLOSE,
-                    List.of(new DialogBody.PlainMessage(Component.text("By using WeatherMC, you agree that we use & collect the following data:")
+                    List.of(new DialogBody.PlainMessage(Component.text("By using WeatherMC, you agree that we do the following with your data:")
                             .appendNewline()
                             .appendNewline()
-                            .append(Component.text(" • Minecraft Username/UUID"))
+                            .append(Component.text(" • Send IP Address to IPInfo.io"))
                             .appendNewline()
-                            .append(Component.text(" • IP Address"))
+                            .append(Component.text(" • Send the resulting geo data to OpenWeatherMap"))
                             .appendNewline()
-                            .append(Component.text(" • Location Data")),
+                            .append(Component.text(" • Cache the results locally")),
                             500)),
-                    new ArrayList<DialogInput>()
+                    new ArrayList<>()
             ),
             new DialogActionButton(
                     Component.text("Accept & Continue"),
@@ -45,10 +47,10 @@ public class ShowPrivacyPolicy {
             )
     );
     public static void handle(PlayerSpawnEvent event) {
-        if (event.getPlayer().hasTag(Tag.Boolean("privacy_policy"))) {
+        if (jsonObject.has(event.getPlayer().getUuid().toString())) {
             ConfigDialog.showGeneral(event.getPlayer());
-            return;
+        } else {
+            event.getPlayer().showDialog(dialog);
         }
-        event.getPlayer().showDialog(dialog);
     }
 }

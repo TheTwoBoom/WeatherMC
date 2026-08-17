@@ -8,6 +8,8 @@ import net.minestom.server.entity.Player;
 
 import java.util.List;
 
+import static app.myhtl.weathermc.Server.jsonObject;
+
 public class ConfigDialog {
     public static final Dialog mainMenuAdvanced = new Dialog.MultiAction(
             new DialogMetadata(
@@ -37,7 +39,7 @@ public class ConfigDialog {
                     Component.text("Exit"),
                     null,
                     150,
-                    new DialogAction.Custom(Key.key("weathermc", "disconnect"), null)
+                    new DialogAction.Custom(Key.key("weathermc", "menu/general"), null)
             ),
             2
     );
@@ -80,6 +82,11 @@ public class ConfigDialog {
         player.showDialog(mainMenuAdvanced);
     }
     public static void showAutoLoc(Player player) {
+        var playerJson = jsonObject.getAsJsonObject(player.getUuid().toString());
+        var locData = "[NO DATA AVAILABLE]";
+        if (playerJson.has("cityName") && playerJson.has("countryCode")) {
+            locData = playerJson.getAsJsonPrimitive("cityName").getAsString() + ", " + playerJson.getAsJsonPrimitive("countryCode").getAsString();
+        }
         Dialog confirmLoc = new Dialog.Confirmation(
                 new DialogMetadata(
                         Component.text("WeatherMC Config"),
@@ -89,7 +96,7 @@ public class ConfigDialog {
                         DialogAfterAction.CLOSE,
                         List.of(
                                 new DialogBody.PlainMessage(Component.text("Is this data correct?"), 265),
-                                new DialogBody.PlainMessage(Component.text("<Example Data>"), 265)
+                                new DialogBody.PlainMessage(Component.text(locData), 265)
                         ),
                         List.of()
                 ),
@@ -97,7 +104,7 @@ public class ConfigDialog {
                         Component.text("Yes"),
                         null,
                         150,
-                        new DialogAction.Custom(Key.key("weathermc", "disconnect"), null)
+                        new DialogAction.Custom(Key.key("weathermc", "advanced"), null)
                 ),
                 new DialogActionButton(
                         Component.text("No"),
@@ -109,6 +116,11 @@ public class ConfigDialog {
         player.showDialog(confirmLoc);
     }
     public static void showLocMenu(Player player) {
+        var playerJson = jsonObject.getAsJsonObject(player.getUuid().toString());
+        if (!playerJson.has("cityName")) { playerJson.addProperty("cityName", ""); }
+        if (!playerJson.has("countryCode")) { playerJson.addProperty("countryCode", ""); }
+        var countryCode = playerJson.getAsJsonPrimitive("countryCode").getAsString();
+        var cityName = playerJson.getAsJsonPrimitive("cityName").getAsString();
         var locMenu = new Dialog.Notice(
                 new DialogMetadata(
                         Component.text("WeatherMC Config -> Location"),
@@ -123,10 +135,18 @@ public class ConfigDialog {
                                         250,
                                         Component.text("City name").append(Component.text("*", NamedTextColor.RED)),
                                         true,
-                                        "",
+                                        cityName,
                                         250,
                                         null
-
+                                ),
+                                new DialogInput.Text(
+                                        "country_code",
+                                        250,
+                                        Component.text("2-letter country code").append(Component.text("*", NamedTextColor.RED)),
+                                        true,
+                                        countryCode,
+                                        250,
+                                        null
                                 )
                         )
                 ),
@@ -134,7 +154,7 @@ public class ConfigDialog {
                         Component.text("Exit"),
                         null,
                         150,
-                        new DialogAction.Custom(Key.key("weathermc", "disconnect"), null)
+                        new DialogAction.RunCommand("loc " + cityName + " " + countryCode)
                 )
         );
         player.showDialog(locMenu);
