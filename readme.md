@@ -21,10 +21,11 @@ java -jar WeatherMC.jar -Xms256m -Xmx1024m
 - Automatic location detection via IP address
 
 ## Screenshots
-
+<img width="600" alt="demo1" src="https://github.com/user-attachments/assets/db444103-3368-4fc2-b723-0310a8719265" />
+<img width="600" alt="demo2" src="https://github.com/user-attachments/assets/75612189-1285-437e-94b0-11797075a7c6" />
 
 ## Demo
-
+https://github.com/user-attachments/assets/46592935-96d7-4ee8-a5f4-0ce555938a5b
 
 ## Used Libraries/Software
 This project was built using
