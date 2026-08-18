@@ -23,7 +23,7 @@ public class ConfigDialog {
                         null,
                         false,
                         false,
-                        DialogAfterAction.CLOSE,
+                        DialogAfterAction.WAIT_FOR_RESPONSE,
                         List.of(new DialogBody.PlainMessage(Component.text("Note that the automatic config may not be accurate and changes could be needed"), 265)),
                         List.of()
                 ),
@@ -67,7 +67,7 @@ public class ConfigDialog {
                         null,
                         false,
                         false,
-                        DialogAfterAction.CLOSE,
+                        DialogAfterAction.WAIT_FOR_RESPONSE,
                         List.of(
                                 new DialogBody.PlainMessage(Component.text("Is this data correct?"), 265),
                                 new DialogBody.PlainMessage(Component.text(locData), 265)
