@@ -6,9 +6,10 @@ WeatherMC is a helpful weather-widget in your Minecraft server-list, that doesn'
 
 ## Quick Start
 Download the latest version from the [Releases](https://github.com/TheTwoBoom/WeatherMC/releases) page\
-The JAR file can be executed on any Java 21+ runtime enviroment with the following command:
+Create a file called "key.env" in the same directory and add your OpenWeatherMap API key\
+The JAR file can be executed on any Java 25+ runtime enviroment with the following command:
 ```
-java -jar WeatherMC.jar -Xms256m -Xmx1024m
+java -jar WeatherMC.jar -Xms=256m -Xmx=1024m
 ```
 
 > [!WARNING]
@@ -21,10 +22,11 @@ java -jar WeatherMC.jar -Xms256m -Xmx1024m
 - Automatic location detection via IP address
 
 ## Screenshots
-
+<img width="600" alt="demo1" src="https://github.com/user-attachments/assets/db444103-3368-4fc2-b723-0310a8719265" />
+<img width="600" alt="demo2" src="https://github.com/user-attachments/assets/75612189-1285-437e-94b0-11797075a7c6" />
 
 ## Demo
-
+https://github.com/user-attachments/assets/46592935-96d7-4ee8-a5f4-0ce555938a5b
 
 ## Used Libraries/Software
 This project was built using
