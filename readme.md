@@ -6,6 +6,7 @@ WeatherMC is a helpful weather-widget in your Minecraft server-list, that doesn'
 
 ## Quick Start
 Download the latest version from the [Releases](https://github.com/TheTwoBoom/WeatherMC/releases) page\
+Create a file called "key.env" in the same directory and add your OpenWeatherMap API key
 The JAR file can be executed on any Java 25+ runtime enviroment with the following command:
 ```
 java -jar WeatherMC.jar -Xms=256m -Xmx=1024m
