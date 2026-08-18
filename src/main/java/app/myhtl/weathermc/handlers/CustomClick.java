@@ -13,6 +13,8 @@ import net.minestom.server.adventure.serializer.nbt.NbtComponentSerializer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.PlayerCustomClickEvent;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.Objects;
 
 import static app.myhtl.weathermc.Server.jsonObject;
@@ -29,8 +31,25 @@ public class CustomClick {
             case "weathermc:privacy_policy/decline":
                 player.kick(Component.text("In order to use this service, please accept our privacy policy!").decorate(TextDecoration.BOLD).color(TextColor.fromHexString("#EB7114")));
                 break;
+            case "weathermc:apply_loc":
+                assert event.getPayload() != null;
+                var content = (CompoundBinaryTag) event.getPayload().asBinaryTag();
+                InetAddress ipAddress = ((InetSocketAddress) player.getPlayerConnection().getRemoteAddress()).getAddress();
+                var playerJson = jsonObject.getAsJsonObject(player.getUuid().toString());
+
+                playerJson.addProperty("cityName", ((StringBinaryTag) Objects.requireNonNull(content.get("city_name"))).value());
+                playerJson.addProperty("countryCode", ((StringBinaryTag) Objects.requireNonNull(content.get("country_code"))).value());
+                playerJson.addProperty("ipAddress", ipAddress.getHostAddress());
+                savePlayerData();
+                player.kick(Component.text("Saved all changes"));
+                break;
             case "weathermc:menu/automatic":
                 DataSources.getLoc(player);
+
+                playerJson = jsonObject.getAsJsonObject(player.getUuid().toString());
+                ipAddress = ((InetSocketAddress) player.getPlayerConnection().getRemoteAddress()).getAddress();
+                playerJson.addProperty("ipAddress", ipAddress.getHostAddress());
+
                 ConfigDialog.showAutoLoc(player);
                 break;
             case "weathermc:menu/loc":
@@ -38,17 +57,6 @@ public class CustomClick {
                 break;
             case "weathermc:menu/general":
                 ConfigDialog.showGeneral(player);
-                break;
-            case "weathermc:apply_loc":
-                assert event.getPayload() != null;
-                var content = (CompoundBinaryTag) event.getPayload().asBinaryTag();
-
-                var playerJson = jsonObject.getAsJsonObject(player.getUuid().toString());
-                playerJson.addProperty("cityName", ((StringBinaryTag) Objects.requireNonNull(content.get("city_name"))).value());
-                playerJson.addProperty("countryCode", ((StringBinaryTag) Objects.requireNonNull(content.get("country_code"))).value());
-
-                savePlayerData();
-                player.kick(Component.text("Saved all changes"));
                 break;
             case "weathermc:disconnect":
                 savePlayerData();

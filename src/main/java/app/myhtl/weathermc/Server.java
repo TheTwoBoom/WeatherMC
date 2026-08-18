@@ -63,6 +63,7 @@ public class Server {
         MinecraftServer.setDifficulty(Difficulty.PEACEFUL);
         MinecraftServer.setCompressionThreshold(64);
         minecraftServer.start("0.0.0.0", 25565);
+        System.out.println("Server started on port 25565");
     }
     public static void loadPlayerData() {
         try (var in = new FileReader("playerData.json")) {
