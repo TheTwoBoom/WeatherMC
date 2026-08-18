@@ -14,7 +14,9 @@ public class AsyncPlayerConfig {
     public static void handle(AsyncPlayerConfigurationEvent event, InstanceContainer container) {
         final Player player = event.getPlayer();
         InetAddress ipAddress = ((InetSocketAddress) player.getPlayerConnection().getRemoteAddress()).getAddress();
-        jsonObject.getAsJsonObject(player.getUuid().toString()).addProperty("ipAddress", ipAddress.getHostAddress());
+        try {
+            jsonObject.getAsJsonObject(player.getUuid().toString()).addProperty("ipAddress", ipAddress.getHostAddress());
+        } catch (Exception _) {}
         event.setSpawningInstance(container);
         player.setRespawnPoint(new Pos(0, 42, 0));
     }

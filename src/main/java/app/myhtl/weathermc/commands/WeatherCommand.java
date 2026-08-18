@@ -10,7 +10,7 @@ public class WeatherCommand extends Command {
         setDefaultExecutor((sender, context) -> {
             if (sender instanceof Player player) {
                 try {
-                    sender.sendMessage(DataSources.parseWeatherJson(player));
+                    sender.sendMessage(DataSources.getWeather(player.getUuid()));
                 } catch (Exception e) {
                     sender.sendMessage("Weather could not be fetched: " + e);
                 }

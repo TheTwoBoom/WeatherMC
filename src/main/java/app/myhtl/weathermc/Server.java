@@ -21,11 +21,13 @@ import net.minestom.server.world.Difficulty;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Properties;
 
 public class Server {
     public static JsonObject jsonObject;
+    public static ArrayList<String> ipAddresses = new ArrayList<>();
     public static Properties config = loadConfig();
     public static String openWeatherKey;
     static void main(String[] args) {
@@ -65,7 +67,7 @@ public class Server {
     public static void loadPlayerData() {
         try (var in = new FileReader("playerData.json")) {
             jsonObject = new Gson().fromJson(in.readAllAsString(), JsonElement.class).getAsJsonObject();
-        } catch (IOException e) {
+        } catch (Exception e) {
             jsonObject = new JsonObject();
         }
     }

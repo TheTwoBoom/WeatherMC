@@ -1,48 +1,21 @@
 package app.myhtl.weathermc;
 
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.BinaryTagTypes;
+import net.kyori.adventure.nbt.StringBinaryTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.adventure.serializer.nbt.NbtComponentSerializer;
 import net.minestom.server.dialog.*;
 import net.minestom.server.entity.Player;
+import net.minestom.server.utils.nbt.BinaryTagUtil;
 
 import java.util.List;
 
 import static app.myhtl.weathermc.Server.jsonObject;
 
 public class ConfigDialog {
-    public static final Dialog mainMenuAdvanced = new Dialog.MultiAction(
-            new DialogMetadata(
-                    Component.text("WeatherMC Config"),
-                    null,
-                    false,
-                    false,
-                    DialogAfterAction.CLOSE,
-                    List.of(new DialogBody.PlainMessage(Component.text("Note that changes are saved automatically"), 150)),
-                    List.of()
-            ),
-            List.of(
-                    new DialogActionButton(
-                            Component.text("Location"),
-                            null,
-                            150,
-                            new DialogAction.Custom(Key.key("weathermc", "menu/loc"), null)
-                    ),
-                    new DialogActionButton(
-                            Component.text("Formatting"),
-                            null,
-                            150,
-                            new DialogAction.Custom(Key.key("weathermc", "menu/loc"), null)
-                    )
-            ),
-            new DialogActionButton(
-                    Component.text("Exit"),
-                    null,
-                    150,
-                    new DialogAction.Custom(Key.key("weathermc", "menu/general"), null)
-            ),
-            2
-    );
     public static void showGeneral(Player player) {
         Dialog mainMenu = new Dialog.MultiAction(
                 new DialogMetadata(
@@ -59,13 +32,13 @@ public class ConfigDialog {
                                 Component.text("Automatic Location Detection"),
                                 null,
                                 250,
-                                new DialogAction.Custom(Key.key("weathermc", "automatic"), null)
+                                new DialogAction.Custom(Key.key("weathermc", "menu/automatic"), null)
                         ),
                         new DialogActionButton(
                                 Component.text("Manual Mode"),
                                 null,
                                 250,
-                                new DialogAction.Custom(Key.key("weathermc", "advanced"), null)
+                                new DialogAction.Custom(Key.key("weathermc", "menu/loc"), null)
                         )
                 ),
                 new DialogActionButton(
@@ -78,14 +51,15 @@ public class ConfigDialog {
         );
         player.showDialog(mainMenu);
     }
-    public static void showAdvanced(Player player) {
-        player.showDialog(mainMenuAdvanced);
-    }
     public static void showAutoLoc(Player player) {
         var playerJson = jsonObject.getAsJsonObject(player.getUuid().toString());
         var locData = "[NO DATA AVAILABLE]";
+        DialogAction.Custom yesButtonAction;
         if (playerJson.has("cityName") && playerJson.has("countryCode")) {
             locData = playerJson.getAsJsonPrimitive("cityName").getAsString() + ", " + playerJson.getAsJsonPrimitive("countryCode").getAsString();
+            yesButtonAction = new DialogAction.Custom(Key.key("weathermc", "disconnect"), null);
+        } else {
+            yesButtonAction = new DialogAction.Custom(Key.key("weathermc", "menu/loc"), null);
         }
         Dialog confirmLoc = new Dialog.Confirmation(
                 new DialogMetadata(
@@ -104,7 +78,7 @@ public class ConfigDialog {
                         Component.text("Yes"),
                         null,
                         150,
-                        new DialogAction.Custom(Key.key("weathermc", "advanced"), null)
+                        yesButtonAction
                 ),
                 new DialogActionButton(
                         Component.text("No"),
@@ -127,7 +101,7 @@ public class ConfigDialog {
                         null,
                         false,
                         false,
-                        DialogAfterAction.CLOSE,
+                        DialogAfterAction.WAIT_FOR_RESPONSE,
                         List.of(new DialogBody.PlainMessage(Component.text("Fields with ").append(Component.text("*", NamedTextColor.RED)).append(Component.text(" are mandatory")), 150)),
                         List.of(
                                 new DialogInput.Text(
@@ -154,7 +128,7 @@ public class ConfigDialog {
                         Component.text("Exit"),
                         null,
                         150,
-                        new DialogAction.RunCommand("loc " + cityName + " " + countryCode)
+                        new DialogAction.DynamicCustom(Key.key("weathermc", "apply_loc"), null)
                 )
         );
         player.showDialog(locMenu);

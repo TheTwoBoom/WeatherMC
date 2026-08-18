@@ -3,11 +3,17 @@ package app.myhtl.weathermc.handlers;
 import app.myhtl.weathermc.ConfigDialog;
 import app.myhtl.weathermc.DataSources;
 import com.google.gson.JsonObject;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.StringBinaryTag;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.minestom.server.adventure.serializer.nbt.NbtComponentSerializer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.PlayerCustomClickEvent;
+
+import java.util.Objects;
 
 import static app.myhtl.weathermc.Server.jsonObject;
 import static app.myhtl.weathermc.Server.savePlayerData;
@@ -23,7 +29,7 @@ public class CustomClick {
             case "weathermc:privacy_policy/decline":
                 player.kick(Component.text("In order to use this service, please accept our privacy policy!").decorate(TextDecoration.BOLD).color(TextColor.fromHexString("#EB7114")));
                 break;
-            case "weathermc:automatic":
+            case "weathermc:menu/automatic":
                 DataSources.getLoc(player);
                 ConfigDialog.showAutoLoc(player);
                 break;
@@ -33,10 +39,19 @@ public class CustomClick {
             case "weathermc:menu/general":
                 ConfigDialog.showGeneral(player);
                 break;
-            case "weathermc:advanced":
-                ConfigDialog.showAdvanced(player);
+            case "weathermc:apply_loc":
+                assert event.getPayload() != null;
+                var content = (CompoundBinaryTag) event.getPayload().asBinaryTag();
+
+                var playerJson = jsonObject.getAsJsonObject(player.getUuid().toString());
+                playerJson.addProperty("cityName", ((StringBinaryTag) Objects.requireNonNull(content.get("city_name"))).value());
+                playerJson.addProperty("countryCode", ((StringBinaryTag) Objects.requireNonNull(content.get("country_code"))).value());
+
+                savePlayerData();
+                player.kick(Component.text("Saved all changes"));
                 break;
             case "weathermc:disconnect":
+                savePlayerData();
                 player.kick(Component.text("Saved all changes"));
                 break;
             default:
