@@ -28,7 +28,6 @@ import java.util.Properties;
 public class Server {
     public static JsonObject jsonObject;
     public static ArrayList<String> ipAddresses = new ArrayList<>();
-    public static Properties config = loadConfig();
     public static String openWeatherKey;
     static void main(String[] args) {
         System.setProperty("minestom.tps", "1");
@@ -39,7 +38,7 @@ public class Server {
         try (FileReader inputStream = new FileReader("key.env")) {
             openWeatherKey = inputStream.readAllAsString();
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't read key.env! Please add the OpenWeatherMap appID to the file");
+            System.out.println("Couldn't read key.env! Please add the OpenWeatherMap appID to the file. Weather Fetching WILL BE BROKEN");
         }
 
         // Create the instance
@@ -76,15 +75,5 @@ public class Server {
         try (var out = new BufferedOutputStream(new FileOutputStream("playerData.json"))) {
             out.write(new Gson().toJson(jsonObject).getBytes(StandardCharsets.UTF_8));
         } catch (IOException _) {}
-    }
-    public static Properties loadConfig() {
-        String appConfigPath = "server.properties";
-        Properties serverProps = new Properties();
-        try {
-            serverProps.load(new FileInputStream(appConfigPath));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return serverProps;
     }
 }
