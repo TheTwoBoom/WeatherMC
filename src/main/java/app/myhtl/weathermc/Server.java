@@ -18,6 +18,8 @@ import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.world.Difficulty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +28,7 @@ import java.util.Objects;
 import java.util.Properties;
 
 public class Server {
+    private static final Logger log = LoggerFactory.getLogger(Server.class);
     public static JsonObject jsonObject;
     public static ArrayList<String> ipAddresses = new ArrayList<>();
     public static String openWeatherKey;
@@ -38,7 +41,7 @@ public class Server {
         try (FileReader inputStream = new FileReader("key.env")) {
             openWeatherKey = inputStream.readAllAsString();
         } catch (IOException e) {
-            System.out.println("Couldn't read key.env! Please add the OpenWeatherMap appID to the file. Weather Fetching WILL BE BROKEN");
+            log.error("Couldn't read key.env! Please add the OpenWeatherMap appID to the file. Weather Fetching WILL BE BROKEN", e);
         }
 
         // Create the instance
@@ -62,7 +65,7 @@ public class Server {
         MinecraftServer.setDifficulty(Difficulty.PEACEFUL);
         MinecraftServer.setCompressionThreshold(64);
         minecraftServer.start("0.0.0.0", 25565);
-        System.out.println("Server started on port 25565");
+        log.info("Server started on port 25565");
     }
     public static void loadPlayerData() {
         try (var in = new FileReader("playerData.json")) {
@@ -72,8 +75,11 @@ public class Server {
         }
     }
     public static void savePlayerData() {
+        log.info("Saving player data...");
         try (var out = new BufferedOutputStream(new FileOutputStream("playerData.json"))) {
             out.write(new Gson().toJson(jsonObject).getBytes(StandardCharsets.UTF_8));
-        } catch (IOException _) {}
+        } catch (IOException e) {
+            log.error("Error while saving player data: ", e);
+        }
     }
 }

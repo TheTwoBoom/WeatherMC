@@ -6,10 +6,8 @@ import com.google.gson.JsonObject;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.StringBinaryTag;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.minestom.server.adventure.serializer.nbt.NbtComponentSerializer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.PlayerCustomClickEvent;
 
@@ -23,6 +21,8 @@ import static app.myhtl.weathermc.Server.savePlayerData;
 public class CustomClick {
     public static void handle(PlayerCustomClickEvent event) {
         Player player = event.getPlayer();
+        InetAddress ipAddress = ((InetSocketAddress) player.getPlayerConnection().getRemoteAddress()).getAddress();
+        var playerJson = jsonObject.getAsJsonObject(player.getUuid().toString());
         switch (event.getKey().asMinimalString()) {
             case "weathermc:privacy_policy/accept":
                 jsonObject.add(player.getUuid().toString(), new JsonObject());
@@ -34,8 +34,6 @@ public class CustomClick {
             case "weathermc:apply_loc":
                 assert event.getPayload() != null;
                 var content = (CompoundBinaryTag) event.getPayload().asBinaryTag();
-                InetAddress ipAddress = ((InetSocketAddress) player.getPlayerConnection().getRemoteAddress()).getAddress();
-                var playerJson = jsonObject.getAsJsonObject(player.getUuid().toString());
 
                 playerJson.addProperty("cityName", ((StringBinaryTag) Objects.requireNonNull(content.get("city_name"))).value());
                 playerJson.addProperty("countryCode", ((StringBinaryTag) Objects.requireNonNull(content.get("country_code"))).value());
